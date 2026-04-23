@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlatmateMatch — Find Your Perfect Flatmate</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #161921;
+    --surface2: #1e2230;
+    --border: rgba(255,255,255,0.07);
+    --accent: #7cffd4;
+    --accent2: #ff6b6b;
+    --accent3: #ffd166;
+    --text: #e8eaf0;
+    --muted: #7a7f94;
+    --card-radius: 20px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 3rem;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,15,20,0.85);
+    backdrop-filter: blur(16px);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--accent); }
+
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    background: var(--accent);
+    color: #0d0f14;
+    border: none;
+    padding: 0.6rem 1.4rem;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  .nav-cta:hover { transform: scale(1.04); opacity: 0.9; }
+
+  /* PAGE SECTIONS */
+  section { display: none; }
+  section.active { display: block; }
+
+  /* ===== HERO ===== */
+  #hero {
+    display: none;
+    min-height: calc(100vh - 65px);
+    position: relative;
+    overflow: hidden;
+  }
+  #hero.active { display: flex; flex-direction: column; }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 70% 20%, rgba(124,255,212,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(255,107,107,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    padding: 5rem 3rem 3rem;
+    position: relative;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(124,255,212,0.1);
+    border: 1px solid rgba(124,255,212,0.25);
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.35rem 0.9rem;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.8rem, 5vw, 4.2rem);
+    line-height: 1.07;
+    letter-spacing: -1.5px;
+    margin-bottom: 1.4rem;
+  }
+  .hero-title .hl { color: var(--accent); }
+
+  .hero-sub {
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    max-width: 480px;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-actions { display: flex; gap: 1rem; align-items: center; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0d0f14;
+    border: none;
+    padding: 0.85rem 2rem;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 30px rgba(124,255,212,0.2);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(124,255,212,0.35); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 0.85rem 2rem;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-ghost:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+
+  /* HERO CARDS */
+  .hero-visual { position: relative; height: 460px; }
+
+  .match-card {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    padding: 1.2rem;
+    width: 240px;
+    transition: transform 0.3s;
+    animation: floatCard 6s ease-in-out infinite;
+  }
+  .match-card:nth-child(2) { animation-delay: -2s; }
+  .match-card:nth-child(3) { animation-delay: -4s; }
+
+  @keyframes floatCard {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .mc1 { top: 0; left: 20px; z-index: 3; }
+  .mc2 { top: 120px; right: 0; z-index: 2; }
+  .mc3 { bottom: 20px; left: 60px; z-index: 1; }
+
+  .card-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .card-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .card-uni { font-size: 0.78rem; color: var(--muted); margin-bottom: 0.8rem; }
+
+  .card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 100px;
+    background: rgba(255,255,255,0.07);
+    color: var(--muted);
+  }
+  .tag.green { background: rgba(124,255,212,0.12); color: var(--accent); }
+  .tag.red { background: rgba(255,107,107,0.12); color: var(--accent2); }
+  .tag.yellow { background: rgba(255,209,102,0.12); color: var(--accent3); }
+
+  .match-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--accent);
+    color: #0d0f14;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 0.25rem 0.55rem;
+    border-radius: 100px;
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex;
+    gap: 3rem;
+    padding: 2rem 3rem;
+    border-top: 1px solid var(--border);
+    position: relative;
+  }
+  .stat { }
+  .stat-number {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--accent);
+  }
+  .stat-label { font-size: 0.82rem; color: var(--muted); margin-top: 0.15rem; }
+
+  /* ===== ONBOARDING ===== */
+  #onboarding {
+    min-height: calc(100vh - 65px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+  }
+  #onboarding.active { display: flex; }
+
+  .onboard-wrap {
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .step-indicator {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .step-dot {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--surface2);
+    flex: 1;
+    transition: background 0.3s;
+  }
+  .step-dot.done { background: var(--accent); }
+  .step-dot.active { background: rgba(124,255,212,0.5); }
+
+  .step { display: none; }
+  .step.active { display: block; }
+
+  .step-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+  }
+
+  .step-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.6rem;
+  }
+
+  .step-sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.6; }
+
+  .field-group { margin-bottom: 1.2rem; }
+  .field-label { font-size: 0.83rem; font-weight: 600; color: var(--muted); margin-bottom: 0.5rem; display: block; }
+
+  .field-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .field-input:focus { border-color: rgba(124,255,212,0.4); }
+
+  .range-row { display: flex; align-items: center; gap: 1rem; }
+  .range-input {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  .range-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(124,255,212,0.4);
+  }
+  .range-val {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--accent);
+    min-width: 70px;
+    text-align: right;
+  }
+
+  .chip-grid { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+  .chip {
+    padding: 0.5rem 1rem;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.18s;
+    user-select: none;
+  }
+  .chip:hover { border-color: rgba(124,255,212,0.3); color: var(--text); }
+  .chip.selected {
+    background: rgba(124,255,212,0.12);
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .step-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 2.5rem; }
+
+  .btn-back {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.75rem 1.5rem;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-back:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+  .btn-next {
+    background: var(--accent);
+    color: #0d0f14;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 20px rgba(124,255,212,0.2);
+  }
+  .btn-next:hover { transform: translateY(-1px); box-shadow: 0 0 30px rgba(124,255,212,0.35); }
+
+  /* ===== MATCHES ===== */
+  #matches {
+    min-height: calc(100vh - 65px);
+    padding: 3rem;
+    display: none;
+  }
+  #matches.active { display: block; }
+
+  .matches-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2.5rem;
+  }
+
+  .matches-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    letter-spacing: -0.5px;
+  }
+  .matches-title span { color: var(--accent); }
+
+  .filter-row { display: flex; gap: 0.6rem; }
+  .filter-btn {
+    padding: 0.45rem 1rem;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .filter-btn.active-filter {
+    background: rgba(124,255,212,0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .matches-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.4rem;
+  }
+
+  .profile-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at top right, rgba(124,255,212,0.04), transparent 60%);
+    pointer-events: none;
+  }
+  .profile-card:hover {
+    border-color: rgba(124,255,212,0.25);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+
+  .pc-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; }
+
+  .pc-avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+  }
+
+  .pc-meta { flex: 1; }
+  .pc-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  .pc-detail { font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem; }
+
+  .pc-score {
+    text-align: right;
+  }
+  .pc-score-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--accent);
+  }
+  .pc-score-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .pc-budget {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.83rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .pc-budget-val {
+    font-weight: 600;
+    color: var(--accent3);
+  }
+
+  .pc-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.2rem; }
+
+  .pc-bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+  }
+  .pc-bar {
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    margin-bottom: 0.8rem;
+    overflow: hidden;
+  }
+  .pc-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), rgba(124,255,212,0.5));
+    transition: width 0.6s ease;
+  }
+
+  .pc-actions { display: flex; gap: 0.6rem; }
+  .pc-btn {
+    flex: 1;
+    padding: 0.6rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+    text-align: center;
+  }
+  .pc-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+  .pc-btn.primary {
+    background: rgba(124,255,212,0.1);
+    border-color: rgba(124,255,212,0.3);
+    color: var(--accent);
+  }
+  .pc-btn.primary:hover { background: rgba(124,255,212,0.18); }
+
+  /* ===== PROFILE DETAIL ===== */
+  #profile-detail {
+    min-height: calc(100vh - 65px);
+    padding: 3rem;
+    display: none;
+  }
+  #profile-detail.active { display: block; }
+
+  .pd-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-bottom: 2rem;
+    transition: color 0.2s;
+  }
+  .pd-back:hover { color: var(--text); }
+
+  .pd-layout { display: grid; grid-template-columns: 320px 1fr; gap: 2rem; }
+
+  .pd-sidebar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    padding: 2rem;
+    height: fit-content;
+  }
+
+  .pd-avatar-lg {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin: 0 auto 1rem;
+  }
+
+  .pd-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    text-align: center;
+    margin-bottom: 0.3rem;
+  }
+  .pd-sub { text-align: center; font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
+
+  .pd-score-big {
+    text-align: center;
+    background: rgba(124,255,212,0.07);
+    border: 1px solid rgba(124,255,212,0.2);
+    border-radius: 14px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .pd-score-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2.5rem;
+    color: var(--accent);
+  }
+  .pd-score-lbl { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+
+  .pd-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+  }
+  .pd-info-row:last-child { border-bottom: none; }
+  .pd-info-key { color: var(--muted); }
+  .pd-info-val { font-weight: 600; }
+
+  .pd-contact-btn {
+    width: 100%;
+    margin-top: 1.5rem;
+    background: var(--accent);
+    color: #0d0f14;
+    border: none;
+    padding: 0.85rem;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 20px rgba(124,255,212,0.2);
+  }
+  .pd-contact-btn:hover { transform: translateY(-1px); }
+
+  .pd-main { display: flex; flex-direction: column; gap: 1.4rem; }
+
+  .pd-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+  }
+
+  .pd-section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  .compat-bars { display: flex; flex-direction: column; gap: 0.8rem; }
+  .compat-row { }
+  .compat-row .pc-bar-label { margin-bottom: 0.4rem; }
+
+  .bio-text { font-size: 0.93rem; color: var(--muted); line-height: 1.7; }
+
+  .interest-cloud { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--surface);
+    border: 1px solid rgba(124,255,212,0.3);
+    border-radius: 14px;
+    padding: 1rem 1.4rem;
+    font-size: 0.88rem;
+    z-index: 999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast-title { font-weight: 700; color: var(--accent); margin-bottom: 0.2rem; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    .hero-content { grid-template-columns: 1fr; padding: 3rem 1.5rem; }
+    .hero-visual { display: none; }
+    .stats-bar { flex-wrap: wrap; gap: 1.5rem; padding: 1.5rem; }
+    #onboarding, #matches, #profile-detail { padding: 1.5rem; }
+    .matches-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .pd-layout { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="showSection('hero')" style="cursor:pointer">Flatmate<span>Match</span></div>
+  <div class="nav-links">
+    <a href="#" onclick="showSection('hero')">Home</a>
+    <a href="#" onclick="showSection('matches')">Browse</a>
+    <a href="#" onclick="showSection('how-it-works')">How it works</a>
+  </div>
+  <button class="nav-cta" onclick="showSection('onboarding')">Find My Match</button>
+</nav>
+
+<!-- HERO -->
+<section id="hero" class="active">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-tag">✦ For Students</div>
+      <h1 class="hero-title">Find a flatmate<br>you'll actually <span class="hl">like.</span></h1>
+      <p class="hero-sub">FlatmateMatch connects you with compatible flatmates based on your budget, lifestyle, study habits and interests — so you don't end up with a nightmare housemate.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="showSection('onboarding')">Start Matching</button>
+        <button class="btn-ghost" onclick="showSection('matches')">Browse Profiles</button>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="match-card mc1">
+        <div class="match-badge">94% Match</div>
+        <div class="card-avatar" style="background:rgba(124,255,212,0.1)">🧑‍💻</div>
+        <div class="card-name">Jamie L.</div>
+        <div class="card-uni">UCL · Computer Science</div>
+        <div class="card-tags">
+          <span class="tag green">£700/mo</span>
+          <span class="tag">Night owl</span>
+          <span class="tag red">No pets</span>
+        </div>
+      </div>
+      <div class="match-card mc2">
+        <div class="match-badge">88% Match</div>
+        <div class="card-avatar" style="background:rgba(255,209,102,0.1)">🎨</div>
+        <div class="card-name">Priya S.</div>
+        <div class="card-uni">KCL · Fine Arts</div>
+        <div class="card-tags">
+          <span class="tag green">£650/mo</span>
+          <span class="tag yellow">Creative</span>
+          <span class="tag">Vegan</span>
+        </div>
+      </div>
+      <div class="match-card mc3">
+        <div class="match-badge">81% Match</div>
+        <div class="card-avatar" style="background:rgba(255,107,107,0.1)">🎵</div>
+        <div class="card-name">Marcus T.</div>
+        <div class="card-uni">Imperial · Medicine</div>
+        <div class="card-tags">
+          <span class="tag green">£800/mo</span>
+          <span class="tag red">Music lover</span>
+          <span class="tag">Gym rat</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-number">12,400+</div><div class="stat-label">Students matched</div></div>
+    <div class="stat"><div class="stat-number">94%</div><div class="stat-label">Happy housemates</div></div>
+    <div class="stat"><div class="stat-number">50+</div><div class="stat-label">Universities covered</div></div>
+    <div class="stat"><div class="stat-number">3 min</div><div class="stat-label">Average setup time</div></div>
+  </div>
+</section>
+
+<!-- ONBOARDING -->
+<section id="onboarding">
+  <div class="onboard-wrap">
+    <div class="step-indicator">
+      <div class="step-dot active" id="dot-0"></div>
+      <div class="step-dot" id="dot-1"></div>
+      <div class="step-dot" id="dot-2"></div>
+      <div class="step-dot" id="dot-3"></div>
+    </div>
+
+    <!-- Step 1: Basic Info -->
+    <div class="step active" id="step-0">
+      <div class="step-label">Step 1 of 4</div>
+      <h2 class="step-title">Tell us about yourself</h2>
+      <p class="step-sub">We'll use this to find people at nearby universities within your budget.</p>
+      <div class="field-group">
+        <label class="field-label">Your name</label>
+        <input class="field-input" type="text" placeholder="e.g. Alex Johnson" id="inp-name">
+      </div>
+      <div class="field-group">
+        <label class="field-label">University</label>
+        <input class="field-input" type="text" placeholder="e.g. University of Manchester" id="inp-uni">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Course / Subject</label>
+        <input class="field-input" type="text" placeholder="e.g. Computer Science" id="inp-course">
+      </div>
+      <div class="step-nav">
+        <div></div>
+        <button class="btn-next" onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Budget -->
+    <div class="step" id="step-1">
+      <div class="step-label">Step 2 of 4</div>
+      <h2 class="step-title">What's your budget?</h2>
+      <p class="step-sub">Set your monthly rent budget. We'll only show you flatmates within a similar range.</p>
+      <div class="field-group">
+        <label class="field-label">Maximum monthly rent</label>
+        <div class="range-row">
+          <input class="range-input" type="range" min="300" max="1500" value="700" step="50" id="budget-range" oninput="document.getElementById('budget-val').textContent='£'+this.value+'/mo'">
+          <div class="range-val" id="budget-val">£700/mo</div>
+        </div>
+      </div>
+      <div class="field-group" style="margin-top:1.5rem">
+        <label class="field-label">Move-in date preference</label>
+        <input class="field-input" type="text" placeholder="e.g. September 2025">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Preferred area / city</label>
+        <input class="field-input" type="text" placeholder="e.g. Shoreditch, London">
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="prevStep()">← Back</button>
+        <button class="btn-next" onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Lifestyle -->
+    <div class="step" id="step-2">
+      <div class="step-label">Step 3 of 4</div>
+      <h2 class="step-title">Your lifestyle habits</h2>
+      <p class="step-sub">Select everything that applies. This helps us weed out incompatible matches.</p>
+
+      <div class="field-group">
+        <label class="field-label" style="margin-bottom:0.7rem">Sleep schedule</label>
+        <div class="chip-grid">
+          <div class="chip" onclick="toggleChip(this)">🌅 Early bird</div>
+          <div class="chip selected" onclick="toggleChip(this)">🦉 Night owl</div>
+          <div class="chip" onclick="toggleChip(this)">😐 Flexible</div>
+        </div>
+      </div>
+
+      <div class="field-group" style="margin-top:1.2rem">
+        <label class="field-label" style="margin-bottom:0.7rem">Cleanliness</label>
+        <div class="chip-grid">
+          <div class="chip selected" onclick="toggleChip(this)">✨ Very tidy</div>
+          <div class="chip" onclick="toggleChip(this)">🙂 Fairly tidy</div>
+          <div class="chip" onclick="toggleChip(this)">🤷 Relaxed</div>
+        </div>
+      </div>
+
+      <div class="field-group" style="margin-top:1.2rem">
+        <label class="field-label" style="margin-bottom:0.7rem">Social preferences</label>
+        <div class="chip-grid">
+          <div class="chip" onclick="toggleChip(this)">🎉 Love having guests</div>
+          <div class="chip selected" onclick="toggleChip(this)">🏠 Mostly quiet</div>
+          <div class="chip" onclick="toggleChip(this)">⚖️ Mixed</div>
+        </div>
+      </div>
+
+      <div class="field-group" style="margin-top:1.2rem">
+        <label class="field-label" style="margin-bottom:0.7rem">Other preferences</label>
+        <div class="chip-grid">
+          <div class="chip selected" onclick="toggleChip(this)">🚭 Non-smoker</div>
+          <div class="chip" onclick="toggleChip(this)">🐾 Pet-friendly</div>
+          <div class="chip" onclick="toggleChip(this)">🌿 Vegan/Veggie household</div>
+          <div class="chip" onclick="toggleChip(this)">🍺 Social drinker</div>
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn-back" onclick="prevStep()">← Back</button>
+        <button class="btn-next" onclick="nextStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Interests -->
+    <div class="step" id="step-3">
+      <div class="step-label">Step 4 of 4</div>
+      <h2 class="step-title">What are you into?</h2>
+      <p class="step-sub">Pick your interests — we'll match you with people who share your vibe.</p>
+      <div class="chip-grid">
+        <div class="chip selected" onclick="toggleChip(this)">🎮 Gaming</div>
+        <div class="chip" onclick="toggleChip(this)">🎨 Art & Design</div>
+        <div class="chip selected" onclick="toggleChip(this)">🎵 Music</div>
+        <div class="chip" onclick="toggleChip(this)">🏋️ Gym & Fitness</div>
+        <div class="chip" onclick="toggleChip(this)">🍳 Cooking</div>
+        <div class="chip selected" onclick="toggleChip(this)">📚 Reading</div>
+        <div class="chip" onclick="toggleChip(this)">🎬 Movies & TV</div>
+        <div class="chip" onclick="toggleChip(this)">🌍 Travel</div>
+        <div class="chip" onclick="toggleChip(this)">🤖 Tech & Coding</div>
+        <div class="chip" onclick="toggleChip(this)">⚽ Sports</div>
+        <div class="chip" onclick="toggleChip(this)">🧘 Yoga & Wellness</div>
+        <div class="chip selected" onclick="toggleChip(this)">🌿 Sustainability</div>
+        <div class="chip" onclick="toggleChip(this)">🎭 Theatre & Culture</div>
+        <div class="chip" onclick="toggleChip(this)">📸 Photography</div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-back" onclick="prevStep()">← Back</button>
+        <button class="btn-next" onclick="findMatches()" style="background:var(--accent3);box-shadow:0 0 20px rgba(255,209,102,0.2)">🔍 Find My Matches</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MATCHES -->
+<section id="matches">
+  <div class="matches-header">
+    <div>
+      <h2 class="matches-title">Your <span>Matches</span></h2>
+      <p style="color:var(--muted);font-size:0.88rem;margin-top:0.3rem">Sorted by compatibility score</p>
+    </div>
+    <div class="filter-row">
+      <button class="filter-btn active-filter">All</button>
+      <button class="filter-btn">Under £700</button>
+      <button class="filter-btn">Night owls</button>
+      <button class="filter-btn">Quiet</button>
+    </div>
+  </div>
+  <div class="matches-grid" id="matches-grid"></div>
+</section>
+
+<!-- PROFILE DETAIL -->
+<section id="profile-detail">
+  <div class="pd-back" onclick="showSection('matches')">← Back to matches</div>
+  <div class="pd-layout">
+    <div class="pd-sidebar">
+      <div class="pd-avatar-lg" id="pd-avatar"></div>
+      <div class="pd-name" id="pd-name"></div>
+      <div class="pd-sub" id="pd-sub"></div>
+      <div class="pd-score-big">
+        <div class="pd-score-num" id="pd-score"></div>
+        <div class="pd-score-lbl">Compatibility Score</div>
+      </div>
+      <div class="pd-info-row"><span class="pd-info-key">Budget</span><span class="pd-info-val" id="pd-budget"></span></div>
+      <div class="pd-info-row"><span class="pd-info-key">Move-in</span><span class="pd-info-val" id="pd-movein"></span></div>
+      <div class="pd-info-row"><span class="pd-info-key">Sleep</span><span class="pd-info-val" id="pd-sleep"></span></div>
+      <div class="pd-info-row"><span class="pd-info-key">Tidiness</span><span class="pd-info-val" id="pd-tidy"></span></div>
+      <div class="pd-info-row"><span class="pd-info-key">Smoker</span><span class="pd-info-val" id="pd-smoke"></span></div>
+      <button class="pd-contact-btn" onclick="showToast()">✉️ Send Message</button>
+    </div>
+    <div class="pd-main">
+      <div class="pd-section">
+        <div class="pd-section-title">About</div>
+        <p class="bio-text" id="pd-bio"></p>
+      </div>
+      <div class="pd-section">
+        <div class="pd-section-title">Compatibility Breakdown</div>
+        <div class="compat-bars" id="pd-compat"></div>
+      </div>
+      <div class="pd-section">
+        <div class="pd-section-title">Interests</div>
+        <div class="interest-cloud" id="pd-interests"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div style="max-width:900px;margin:0 auto;padding:4rem 3rem;">
+    <div style="text-align:center;margin-bottom:3.5rem;">
+      <div style="display:inline-flex;align-items:center;gap:0.5rem;background:rgba(124,255,212,0.1);border:1px solid rgba(124,255,212,0.25);color:var(--accent);font-size:0.78rem;font-weight:700;padding:0.35rem 0.9rem;border-radius:100px;margin-bottom:1.2rem;letter-spacing:0.05em;text-transform:uppercase;">✦ Simple Process</div>
+      <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:2.4rem;letter-spacing:-0.5px;margin-bottom:0.8rem;">How <span style="color:var(--accent)">FlatmateMatch</span> works</h2>
+      <p style="color:var(--muted);font-size:1rem;line-height:1.7;max-width:500px;margin:0 auto;">Finding a compatible flatmate takes just a few minutes. Here's the process from start to move-in.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-bottom:1.4rem;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:1.5rem;right:1.5rem;font-family:'Syne',sans-serif;font-weight:800;font-size:3rem;color:rgba(124,255,212,0.07);">01</div>
+        <div style="width:48px;height:48px;background:rgba(124,255,212,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1.2rem;">📝</div>
+        <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;margin-bottom:0.6rem;">Build your profile</h3>
+        <p style="color:var(--muted);font-size:0.88rem;line-height:1.65;">Tell us your university, budget, sleep schedule, cleanliness habits, and lifestyle preferences. It takes about 3 minutes.</p>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:1.5rem;right:1.5rem;font-family:'Syne',sans-serif;font-weight:800;font-size:3rem;color:rgba(255,209,102,0.07);">02</div>
+        <div style="width:48px;height:48px;background:rgba(255,209,102,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1.2rem;">🔍</div>
+        <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;margin-bottom:0.6rem;">Get matched</h3>
+        <p style="color:var(--muted);font-size:0.88rem;line-height:1.65;">Our algorithm scores compatibility across budget, lifestyle, sleep patterns and shared interests to surface your best matches first.</p>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-bottom:3rem;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:1.5rem;right:1.5rem;font-family:'Syne',sans-serif;font-weight:800;font-size:3rem;color:rgba(255,107,107,0.07);">03</div>
+        <div style="width:48px;height:48px;background:rgba(255,107,107,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1.2rem;">💬</div>
+        <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;margin-bottom:0.6rem;">Connect & chat</h3>
+        <p style="color:var(--muted);font-size:0.88rem;line-height:1.65;">Browse full profiles, read bios, and send a message to any match you like. No awkward cold DMs — they already know you're interested.</p>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:1.5rem;right:1.5rem;font-family:'Syne',sans-serif;font-weight:800;font-size:3rem;color:rgba(167,139,250,0.07);">04</div>
+        <div style="width:48px;height:48px;background:rgba(167,139,250,0.1);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1.2rem;">🏠</div>
+        <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem;margin-bottom:0.6rem;">Move in together</h3>
+        <p style="color:var(--muted);font-size:0.88rem;line-height:1.65;">Once you've found your person, coordinate move-in dates and start your life together with a flatmate you actually get along with.</p>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <h3 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;margin-bottom:1.5rem;">Common questions</h3>
+    <div style="display:flex;flex-direction:column;gap:0.8rem;">
+      <details style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.4rem;cursor:pointer;">
+        <summary style="font-weight:600;font-size:0.92rem;list-style:none;display:flex;justify-content:space-between;align-items:center;">Is FlatmateMatch free to use? <span style="color:var(--accent)">+</span></summary>
+        <p style="color:var(--muted);font-size:0.87rem;margin-top:0.8rem;line-height:1.6;">Yes — creating a profile and browsing matches is completely free for students. Premium features like priority placement are optional.</p>
+      </details>
+      <details style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.4rem;cursor:pointer;">
+        <summary style="font-weight:600;font-size:0.92rem;list-style:none;display:flex;justify-content:space-between;align-items:center;">How is the compatibility score calculated? <span style="color:var(--accent)">+</span></summary>
+        <p style="color:var(--muted);font-size:0.87rem;margin-top:0.8rem;line-height:1.6;">We weight budget overlap (30%), lifestyle habits (30%), sleep schedule (20%), and shared interests (20%) to produce your overall match score.</p>
+      </details>
+      <details style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.4rem;cursor:pointer;">
+        <summary style="font-weight:600;font-size:0.92rem;list-style:none;display:flex;justify-content:space-between;align-items:center;">Which universities are supported? <span style="color:var(--accent)">+</span></summary>
+        <p style="color:var(--muted);font-size:0.87rem;margin-top:0.8rem;line-height:1.6;">We support all UK universities. Just type your university name when signing up — if we don't recognise it, we'll add it within 24 hours.</p>
+      </details>
+    </div>
+
+    <div style="text-align:center;margin-top:3rem;">
+      <button class="btn-primary" onclick="showSection('onboarding')" style="font-size:1rem;padding:1rem 2.5rem;">Start Matching Now →</button>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast">
+  <div class="toast-title">✨ Request sent!</div>
+  <div>They'll be notified and can reply through FlatmateMatch.</div>
+</div>
+
+<script>
+// ---- Data ----
+const profiles = [
+  {
+    name: "Jamie Liu", emoji: "🧑‍💻", avatarBg: "rgba(124,255,212,0.12)",
+    uni: "UCL", course: "Computer Science", year: "Year 2",
+    score: 94, budget: "£650–750/mo", movein: "Sep 2025",
+    sleep: "Night owl", tidy: "Very tidy", smoke: "Non-smoker",
+    bio: "Hey! I'm Jamie, a second-year CS student at UCL. I spend most evenings coding or gaming, but I'm pretty clean and considerate. I like a quiet flat during the day for studying but I'm totally fine with people having mates over at weekends. Big fan of anime and building custom PCs in my spare time.",
+    interests: ["🎮 Gaming","🤖 Coding","📺 Anime","🎵 Lo-fi music","☕ Coffee nerd","🌿 Eco-conscious"],
+    compat: [
+      { label: "Budget", val: 97 }, { label: "Lifestyle", val: 91 },
+      { label: "Sleep schedule", val: 95 }, { label: "Shared interests", val: 88 }
+    ],
+    tags: [["£700/mo","green"],["Night owl",""],["Non-smoker",""],["Tidy","green"]]
+  },
+  {
+    name: "Priya Sharma", emoji: "🎨", avatarBg: "rgba(255,209,102,0.12)",
+    uni: "King's College London", course: "Fine Arts", year: "Year 3",
+    score: 88, budget: "£600–700/mo", movein: "Sep 2025",
+    sleep: "Early bird", tidy: "Fairly tidy", smoke: "Non-smoker",
+    bio: "I'm Priya, a final year Fine Arts student who loves making a mess in the studio but keeping the flat clean! I'm vegan, love cooking elaborate meals, and my idea of a great Friday night is a film and homemade curry. I'm pretty easygoing and love meeting new people.",
+    interests: ["🎨 Art","🍳 Cooking","🎬 Film","🌿 Veganism","📚 Books","🧘 Yoga"],
+    compat: [
+      { label: "Budget", val: 90 }, { label: "Lifestyle", val: 86 },
+      { label: "Sleep schedule", val: 72 }, { label: "Shared interests", val: 94 }
+    ],
+    tags: [["£650/mo","green"],["Vegan","yellow"],["Early bird",""],["Artist","yellow"]]
+  },
+  {
+    name: "Marcus Thompson", emoji: "🎵", avatarBg: "rgba(255,107,107,0.12)",
+    uni: "Imperial College", course: "Medicine", year: "Year 1",
+    score: 81, budget: "£750–900/mo", movein: "Oct 2025",
+    sleep: "Mixed", tidy: "Very tidy", smoke: "Non-smoker",
+    bio: "First year medic here — expect me to either be buried in textbooks or at the gym. I'm super clean and organised (medical training does that to you), love music production as a hobby, and I'm looking for a calm flat where I can study properly but still have a social life at weekends.",
+    interests: ["🎵 Music production","🏋️ Gym","📚 Study","🎬 Netflix","⚽ Football","🌍 Travel"],
+    compat: [
+      { label: "Budget", val: 75 }, { label: "Lifestyle", val: 84 },
+      { label: "Sleep schedule", val: 80 }, { label: "Shared interests", val: 83 }
+    ],
+    tags: [["£800/mo","green"],["Gym",""],["Music","red"],["Tidy","green"]]
+  },
+  {
+    name: "Sophie Adeyemi", emoji: "🌍", avatarBg: "rgba(167,139,250,0.12)",
+    uni: "LSE", course: "Economics", year: "Year 2",
+    score: 79, budget: "£600–800/mo", movein: "Sep 2025",
+    sleep: "Flexible", tidy: "Fairly tidy", smoke: "Non-smoker",
+    bio: "Econ student from Lagos, currently at LSE. I love exploring London on weekends and trying new restaurants. I'm social but respectful of study time — I get that we're all students first! Big into sustainability, I'm always trying to cut down on waste in the flat.",
+    interests: ["🌍 Travel","🍳 Foodie","🌿 Sustainability","📸 Photography","🎭 Culture","💼 Networking"],
+    compat: [
+      { label: "Budget", val: 85 }, { label: "Lifestyle", val: 76 },
+      { label: "Sleep schedule", val: 82 }, { label: "Shared interests", val: 72 }
+    ],
+    tags: [["£700/mo","green"],["Flexible",""],["Foodie","yellow"],["Eco","green"]]
+  },
+  {
+    name: "Ryo Tanaka", emoji: "⚽", avatarBg: "rgba(99,202,255,0.12)",
+    uni: "University of Edinburgh", course: "Engineering", year: "Year 1",
+    score: 76, budget: "£500–650/mo", movein: "Sep 2025",
+    sleep: "Early bird", tidy: "Relaxed", smoke: "Non-smoker",
+    bio: "Hey, I'm Ryo — an engineering fresher from Tokyo. I play football twice a week and follow the Premier League obsessively. I'm a bit of a night owl at heart but I try to keep reasonable hours. Looking for somewhere lively but affordable. Happy to split cooking duties!",
+    interests: ["⚽ Football","🎮 Gaming","🤖 Engineering","🍜 Cooking","🎵 J-Pop","🏃 Running"],
+    compat: [
+      { label: "Budget", val: 70 }, { label: "Lifestyle", val: 72 },
+      { label: "Sleep schedule", val: 68 }, { label: "Shared interests", val: 88 }
+    ],
+    tags: [["£600/mo","green"],["Sports",""],["Gamer",""],["Relaxed","yellow"]]
+  },
+  {
+    name: "Aisha Khan", emoji: "📚", avatarBg: "rgba(52,211,153,0.12)",
+    uni: "University of Manchester", course: "Law", year: "Year 3",
+    score: 73, budget: "£650–750/mo", movein: "Jul 2025",
+    sleep: "Night owl", tidy: "Very tidy", smoke: "Non-smoker",
+    bio: "Law student in my final year — I need a quiet flat during the week to get through my caseload! I'm tidy, organised, and really considerate of housemates' space. On weekends I come alive — love going to gigs and trying new coffee shops around Manchester. Would love a flatmate who loves a good debate.",
+    interests: ["📚 Law & Politics","☕ Coffee","🎵 Live music","🏃 Running","🎬 Documentaries","✍️ Writing"],
+    compat: [
+      { label: "Budget", val: 88 }, { label: "Lifestyle", val: 70 },
+      { label: "Sleep schedule", val: 90 }, { label: "Shared interests", val: 54 }
+    ],
+    tags: [["£700/mo","green"],["Night owl",""],["Studious","yellow"],["Tidy","green"]]
+  }
+];
+
+let currentStep = 0;
+const totalSteps = 4;
+
+function showSection(id) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function updateDots() {
+  for (let i = 0; i < totalSteps; i++) {
+    const dot = document.getElementById('dot-'+i);
+    dot.className = 'step-dot';
+    if (i < currentStep) dot.classList.add('done');
+    else if (i === currentStep) dot.classList.add('active');
+  }
+}
+
+function nextStep() {
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  currentStep++;
+  document.getElementById('step-'+currentStep).classList.add('active');
+  updateDots();
+}
+
+function prevStep() {
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  currentStep--;
+  document.getElementById('step-'+currentStep).classList.add('active');
+  updateDots();
+}
+
+function toggleChip(el) {
+  el.classList.toggle('selected');
+}
+
+function findMatches() {
+  renderMatches();
+  showSection('matches');
+}
+
+function renderMatches() {
+  const grid = document.getElementById('matches-grid');
+  grid.innerHTML = '';
+  profiles.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'profile-card';
+    card.innerHTML = `
+      <div class="pc-header">
+        <div class="pc-avatar" style="background:${p.avatarBg}">${p.emoji}</div>
+        <div class="pc-meta">
+          <div class="pc-name">${p.name}</div>
+          <div class="pc-detail">${p.uni} · ${p.course} · ${p.year}</div>
+        </div>
+        <div class="pc-score">
+          <div class="pc-score-num">${p.score}%</div>
+          <div class="pc-score-label">Match</div>
+        </div>
+      </div>
+      <div class="pc-budget">💷 Budget: <span class="pc-budget-val">${p.budget}</span> · 📅 ${p.movein}</div>
+      <div class="pc-tags">
+        ${p.tags.map(([t,c]) => `<span class="tag ${c ? c : ''}">${t}</span>`).join('')}
+      </div>
+      <div class="pc-bar-label"><span>Compatibility</span><span>${p.score}%</span></div>
+      <div class="pc-bar"><div class="pc-bar-fill" style="width:0%" data-target="${p.score}"></div></div>
+      <div class="pc-actions">
+        <button class="pc-btn" onclick="event.stopPropagation();showToast()">⭐ Save</button>
+        <button class="pc-btn primary" onclick="event.stopPropagation();viewProfile(${i})">View Profile →</button>
+      </div>
+    `;
+    card.addEventListener('click', () => viewProfile(i));
+    grid.appendChild(card);
+    // animate bar
+    setTimeout(() => {
+      const fill = card.querySelector('.pc-bar-fill');
+      fill.style.width = fill.dataset.target + '%';
+    }, 100 + i * 80);
+  });
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active-filter'));
+      this.classList.add('active-filter');
+    });
+  });
+}
+
+function viewProfile(idx) {
+  const p = profiles[idx];
+  document.getElementById('pd-avatar').textContent = p.emoji;
+  document.getElementById('pd-avatar').style.background = p.avatarBg;
+  document.getElementById('pd-name').textContent = p.name;
+  document.getElementById('pd-sub').textContent = p.uni + ' · ' + p.course;
+  document.getElementById('pd-score').textContent = p.score + '%';
+  document.getElementById('pd-budget').textContent = p.budget;
+  document.getElementById('pd-movein').textContent = p.movein;
+  document.getElementById('pd-sleep').textContent = p.sleep;
+  document.getElementById('pd-tidy').textContent = p.tidy;
+  document.getElementById('pd-smoke').textContent = p.smoke;
+  document.getElementById('pd-bio').textContent = p.bio;
+
+  const compat = document.getElementById('pd-compat');
+  compat.innerHTML = p.compat.map(c => `
+    <div class="compat-row">
+      <div class="pc-bar-label"><span>${c.label}</span><span style="color:var(--accent)">${c.val}%</span></div>
+      <div class="pc-bar"><div class="pc-bar-fill" style="width:${c.val}%"></div></div>
+    </div>
+  `).join('');
+
+  const interests = document.getElementById('pd-interests');
+  interests.innerHTML = p.interests.map(i => `<span class="chip selected" style="cursor:default">${i}</span>`).join('');
+
+  showSection('profile-detail');
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Init matches on browse
+document.querySelector('.nav-links a:nth-child(2)').addEventListener('click', () => {
+  if (!document.getElementById('matches-grid').innerHTML) renderMatches();
+});
+
+// Init on load
+renderMatches();
+</script>
+</body>
+</html>
